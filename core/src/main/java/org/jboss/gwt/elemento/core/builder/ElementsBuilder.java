@@ -13,22 +13,21 @@
  */
 package org.jboss.gwt.elemento.core.builder;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-// not working with beta-1 import elemental2.core.JsArray;
-import elemental2.core.Array;
 import elemental2.dom.HTMLElement;
-import org.jboss.gwt.elemento.core.Elements;
 import org.jboss.gwt.elemento.core.HasElements;
 import org.jboss.gwt.elemento.core.IsElement;
 
-/** Builder to collect {@link HTMLElement}s */
-public class ElementsBuilder implements TypedBuilder<Iterable<HTMLElement>, ElementsBuilder>, HasElements {
+/** Builder for {@link HasElements} */
+public class ElementsBuilder implements TypedBuilder<HasElements, ElementsBuilder> {
 
-    private final IterableElementsImpl elements;
+    private final HasElementsImpl elements;
 
     public ElementsBuilder() {
-        elements = new IterableElementsImpl();
+        elements = new HasElementsImpl();
     }
 
 
@@ -41,7 +40,15 @@ public class ElementsBuilder implements TypedBuilder<Iterable<HTMLElement>, Elem
 
     /** Adds the given element. */
     public ElementsBuilder add(HTMLElement element) {
-        elements.elements.push(element);
+        elements.add(element);
+        return that();
+    }
+
+    /** Adds all elements from {@link HasElements#asElements()} ()}. */
+    public ElementsBuilder addAll(HasElements elements) {
+        for (HTMLElement element : elements.asElements()) {
+            add(element);
+        }
         return that();
     }
 
@@ -61,20 +68,6 @@ public class ElementsBuilder implements TypedBuilder<Iterable<HTMLElement>, Elem
         return that();
     }
 
-    /**
-     * Adds all elements.
-     *
-     * @deprecated Please use {@link #addAll(Iterable)} instead.
-     */
-    @Deprecated
-    public ElementsBuilder addAll(HasElements elements) {
-        for (HTMLElement element : elements.asElements()) {
-            add(element);
-        }
-        return that();
-    }
-
-
     /** Adds all elements. */
     public ElementsBuilder addAll(IsElement... elements) {
         for (IsElement element : elements) {
@@ -84,15 +77,8 @@ public class ElementsBuilder implements TypedBuilder<Iterable<HTMLElement>, Elem
     }
 
     @Override
-    public Iterable<HTMLElement> get() {
+    public HasElements get() {
         return elements;
-    }
-
-    /** Please use {@link #get()} instead. */
-    @Override
-    @Deprecated
-    public Iterable<HTMLElement> asElements() {
-        return get();
     }
 
     @Override
@@ -101,18 +87,28 @@ public class ElementsBuilder implements TypedBuilder<Iterable<HTMLElement>, Elem
     }
 
 
-    private static class IterableElementsImpl implements Iterable<HTMLElement> {
+    private static class HasElementsImpl implements HasElements {
 
-        final Array<HTMLElement> elements;
+        private final List<HTMLElement> elements;
 
 
-        private IterableElementsImpl() {
-            elements = new Array<>();
+        private HasElementsImpl() {
+            elements = new ArrayList<>();
         }
 
         @Override
-        public Iterator<HTMLElement> iterator() {
-            return Elements.iterator(elements);
+        public Iterable<HTMLElement> asElements() {
+            return new Iterable<HTMLElement>() {
+                @Override
+                public Iterator<HTMLElement> iterator() {
+                    return elements.iterator();
+                }
+            };
+        }
+
+
+        private void add(HTMLElement htmlElement) {
+            elements.add(htmlElement);
         }
     }
 }
