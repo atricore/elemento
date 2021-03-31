@@ -32,7 +32,7 @@
         <dagger.version>2.19</dagger.version>
         <errai.version>4.4.1.Final</errai.version>
         <gin.version>2.1.2</gin.version>
-        <guava.version>27.0-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <javax.inject.version>1</javax.inject.version>
         <nalu.version>1.0.0-rc-12</nalu.version>
         <node.version>v10.13.0</node.version>
